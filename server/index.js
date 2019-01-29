@@ -3,16 +3,18 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const logger = require('morgan');
-const mongoose = require('mongoose');
+const errorHandle = require('./services/error');
+//const mongoose = require('mongoose');
+const mysql = require('mysql');
 const passport = require('passport');
 const cookieParser = require('cookie-parser');
 
-module.exports = function () {
-    let server = express(),
-        start,
-        create;
 
-    create = function(config, db) {
+module.exports = function () {
+    const server = express();
+    let start, create, db;
+
+    create = function(config, database) {
         let routes = require('./routes');
 
         // Server settings
@@ -26,14 +28,14 @@ module.exports = function () {
         server.use(cookieParser());
         server.use(logger('dev'));
         server.use(passport.initialize());
-        mongoose.connect(db.database, {
-            useNewUrlParser: true,
-            useCreateIndex : true,
-        });
-        require('../configs/passport')(passport);
+
+        //require('../configs/passport')(passport);
 
         // Routes settings
         routes.init(server);
+
+        // Middleware to error handle
+        server.use(errorHandle())
     }
 
     start = function () {
