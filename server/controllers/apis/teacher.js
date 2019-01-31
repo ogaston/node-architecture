@@ -1,30 +1,30 @@
 'use strict';
 
 const express = require('express');
-const student = express.Router();
+const teacher = express.Router();
 const httpResponse = require('../response');
 
 module.exports = function (db) {
 
-    student.get('/', function (req, res) {
+    teacher.get('/', function (req, res) {
 
-        db.query(`CALL GetAllPersonal(${process.env.STUDENT_ROLE})`, function (err, result) {
+        db.query(`CALL GetAllPersonal(${process.env.TEACHER_ROLE})`, function (err, result) {
             if (err) throw err;
             return res.status(200).json(result[0])
         });
 
     });
 
-    student.get('/:id', function (req, res) {
+    teacher.get('/:id', function (req, res) {
 
-        db.query(`CALL 	GetPersonalData('${+req.params['id']}', ${process.env.STUDENT_ROLE})`, function (err, result) {
+        db.query(`CALL 	GetPersonalData('${+req.params['id']}', ${process.env.TEACHER_ROLE})`, function (err, result) {
             if (err) throw err;
             return res.status(200).json(httpResponse.validateResult(result))
         });
 
     });
 
-    student.post('/:id', function (req, res) {
+    teacher.post('/:id', function (req, res) {
         const {
             firstname,
             secondname,
@@ -59,52 +59,52 @@ module.exports = function (db) {
                     '${address}',
                     '${neighbor}'
                 );`, function (err, result) {
-            
+
             if (err) throw err;
             return res.status(201).json(result[0][0]);
 
-            
+
         });
     });
 
-    student.put('/:id', function (req, res) {
+    teacher.put('/:id', function (req, res) {
 
-    let actualUser = {};
+        let actualUser = {};
 
-    db.query(`CALL GetPersonalData('${+req.params['id']}', ${process.env.STUDENT_ROLE})`, function (err, result) {
-        if (err) throw err;
+        db.query(`CALL GetPersonalData('${+req.params['id']}', ${process.env.TEACHER_ROLE})`, function (err, result) {
+            if (err) throw err;
 
-        actualUser = result[0][0];
+            actualUser = result[0][0];
 
-        if (typeof actualUser === 'undefined') {
-            return res.status(404).json(httpResponse.onUserNotFound)
-        }
-
-        Object.getOwnPropertyNames(req.body).forEach(val => {
-            if (actualUser.hasOwnProperty(val)) {
-
-                actualUser[val] = req.body[val]
+            if (typeof actualUser === 'undefined') {
+                return res.status(404).json(httpResponse.onUserNotFound)
             }
-        });
-        const {
-            firstname,
-            secondname,
-            surname,
-            lastname,
-            ide,
-            tutor,
-            contract_date,
-            birthday,
-            phone,
-            telephone,
-            municipality,
-            address,
-            neighbor,
-        } = actualUser;
 
-        const id = +req.params['id'];
+            Object.getOwnPropertyNames(req.body).forEach(val => {
+                if (actualUser.hasOwnProperty(val)) {
 
-        db.query(`CALL UpdatePersonalData(
+                    actualUser[val] = req.body[val]
+                }
+            });
+            const {
+                firstname,
+                secondname,
+                surname,
+                lastname,
+                ide,
+                tutor,
+                contract_date,
+                birthday,
+                phone,
+                telephone,
+                municipality,
+                address,
+                neighbor,
+            } = actualUser;
+
+            const id = +req.params['id'];
+
+            db.query(`CALL UpdatePersonalData(
                     '${id}',
                     '${firstname}',
                     '${secondname}',
@@ -120,15 +120,15 @@ module.exports = function (db) {
                     '${address}',
                     '${neighbor}'
                 )`, function (err, result) {
-                    if (err) throw err;
-                    return res.status(201).json(result[0])
-                });
+                if (err) throw err;
+                return res.status(201).json(result[0])
+            });
 
         });
 
     });
 
-    student.delete('/:id', function (req, res) {
+    teacher.delete('/:id', function (req, res) {
 
         db.query(`CALL DeleteUser('${+req.params['id']}')`, function (err, result) {
             if (err) throw err;
@@ -142,5 +142,5 @@ module.exports = function (db) {
 
     });
 
-    return student
+    return teacher
 }

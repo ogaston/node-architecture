@@ -2,22 +2,8 @@
 
 const express = require('express');
 const cryp = require('../../services/encryptor');
+const httpResponse = require('../response');
 const user = express.Router();
-
-
-const httpResponse = {
-    onUserNotFound: {
-        success: false,
-        message: 'User not found.'
-    },
-    validateResult: function (result) {
-        const resultArr = result[0];
-        if (!resultArr.length) {
-            return this.onUserNotFound;
-        }
-        return resultArr
-    },
-}
 
 module.exports = function (db) {
 

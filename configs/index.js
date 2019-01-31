@@ -14,6 +14,7 @@ module.exports = function () {
     process.on('uncaughtException', (err) => {
         //fs.writeSync(1, `Caught exception: ${err}\n`);
         console.error(err.name + ":" + err.message);
+        console.error(err.stack);
     });
 
     if (dotenv.error) {

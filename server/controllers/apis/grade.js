@@ -2,37 +2,36 @@
 
 const express = require('express');
 const httpResponse = require('../response');
-const course = express.Router();
+const grade = express.Router();
 
 module.exports = function (db) {
 
-    course.get('/', function (req, res) {
+    grade.get('/', function (req, res) {
 
-        db.query("CALL GetAllCourses()", function (err, result) {
+        db.query("CALL GetAllGrades()", function (err, result) {
             if (err) throw err;
             return res.status(200).json(result[0])
         });
 
     });
 
-    course.get('/:id', function (req, res) {
+    grade.get('/:id', function (req, res) {
 
-        db.query(`CALL GetCourse('${+req.params['id']}')`, function (err, result) {
+        db.query(`CALL GetGrade('${+req.params['id']}')`, function (err, result) {
             if (err) throw err;
             return res.status(200).json(httpResponse.validateResult(result))
         });
 
     });
 
-    course.post('/', function (req, res) {
+    grade.post('/', function (req, res) {
 
         const {
-            name,
-            no,
-            academic_level
+            description,
+            shortname,
         } = req.body;
 
-        const sql = `CALL CreateCourse('${name}', '${no}', '${academic_level}');`;
+        const sql = `CALL CreateGrade('${description}', '${shortname}');`;
 
         db.query(sql, function (err, result) {
             if (err) throw err;
@@ -42,41 +41,39 @@ module.exports = function (db) {
 
     });
 
-    course.put('/:id', function (req, res) {
+    grade.put('/:id', function (req, res) {
 
-        let actualCourse = {};
+        let actualGrade = {};
 
-        db.query(`CALL GetCourse('${+req.params['id']}')`, function (err, result) {
+        db.query(`CALL GetGrade('${+req.params['id']}')`, function (err, result) {
             if (err) throw err;
 
-            actualCourse = result[0][0];
+            actualGrade = result[0][0];
 
-            if (typeof actualCourse === 'undefined') {
+            if (typeof actualGrade === 'undefined') {
                 return res.status(404).json(httpResponse.onUserNotFound)
             }
 
             Object.getOwnPropertyNames(req.body).forEach(val => {
-                if (actualCourse.hasOwnProperty(val)) {
+                if (actualGrade.hasOwnProperty(val)) {
 
-                    actualCourse[val] = req.body[val]
+                    actualGrade[val] = req.body[val]
                 }
             });
 
             const id = +req.params['id'];
 
             const {
-                name,
-                no,
-                academic_level,
+                description,
+                shortname,
                 status
-            } = actualCourse;
+            } = actualGrade;
 
             db.query(
-                `CALL UpdateCourse(
+                `CALL UpdateGrade(
                         '${id}', 
-                        '${name}', 
-                        '${no}', 
-                        '${academic_level}', 
+                        '${description}', 
+                        '${shortname}',
                         '${status}'
                     )`,
                 function (err, result) {
@@ -88,9 +85,9 @@ module.exports = function (db) {
 
     });
 
-    course.delete('/:id', function (req, res) {
+    grade.delete('/:id', function (req, res) {
 
-        db.query(`CALL DeleteCourse('${+req.params['id']}')`, function (err, result) {
+        db.query(`CALL DeleteGrade('${+req.params['id']}')`, function (err, result) {
             if (err) throw err;
 
             if (typeof result[0][0] === 'undefined') {
@@ -102,5 +99,5 @@ module.exports = function (db) {
 
     });
 
-    return course
+    return grade
 }

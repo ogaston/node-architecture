@@ -1,30 +1,31 @@
 'use strict';
 
 const express = require('express');
-const student = express.Router();
+const personal = express.Router();
 const httpResponse = require('../response');
 
-module.exports = function (db) {
 
-    student.get('/', function (req, res) {
+module.exports = function (db, role) {
 
-        db.query(`CALL GetAllPersonal(${process.env.STUDENT_ROLE})`, function (err, result) {
+    personal.get('/', function (req, res) {
+
+        db.query(`CALL GetAllPersonal(${role})`, function (err, result) {
             if (err) throw err;
             return res.status(200).json(result[0])
         });
 
     });
 
-    student.get('/:id', function (req, res) {
+    personal.get('/:id', function (req, res) {
 
-        db.query(`CALL 	GetPersonalData('${+req.params['id']}', ${process.env.STUDENT_ROLE})`, function (err, result) {
+        db.query(`CALL 	GetPersonalData('${+req.params['id']}', ${role})`, function (err, result) {
             if (err) throw err;
             return res.status(200).json(httpResponse.validateResult(result))
         });
 
     });
 
-    student.post('/:id', function (req, res) {
+    personal.post('/:id', function (req, res) {
         const {
             firstname,
             secondname,
@@ -67,11 +68,11 @@ module.exports = function (db) {
         });
     });
 
-    student.put('/:id', function (req, res) {
+    personal.put('/:id', function (req, res) {
 
     let actualUser = {};
 
-    db.query(`CALL GetPersonalData('${+req.params['id']}', ${process.env.STUDENT_ROLE})`, function (err, result) {
+    db.query(`CALL GetPersonalData('${+req.params['id']}', ${role})`, function (err, result) {
         if (err) throw err;
 
         actualUser = result[0][0];
@@ -128,7 +129,7 @@ module.exports = function (db) {
 
     });
 
-    student.delete('/:id', function (req, res) {
+    personal.delete('/:id', function (req, res) {
 
         db.query(`CALL DeleteUser('${+req.params['id']}')`, function (err, result) {
             if (err) throw err;
@@ -142,5 +143,5 @@ module.exports = function (db) {
 
     });
 
-    return student
+    return personal
 }

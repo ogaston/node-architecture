@@ -6,10 +6,18 @@ const db = require('../../../configs/db').con;
 const registerController = require('../../controllers/apis/register');
 const loginController = require('../../controllers/apis/login');
 const dashboardController = require('../../controllers/apis/dashboard');
+
 const userController = require('../../controllers/apis/user');
+const personalController = require('../../controllers/apis/personal');
 
 const courseController = require('../../controllers/apis/course');
-const studentController = require('../../controllers/apis/student');
+const gradeController = require('../../controllers/apis/grade');
+const subjectController = require('../../controllers/apis/subject');
+
+const roleController = require('../../controllers/apis/role')
+const permissionController = require('../../controllers/apis/permission')
+const periodeController = require('../../controllers/apis/periode')
+
 
 let router = express.Router();
 
@@ -22,10 +30,18 @@ router.use('/register', registerController);
 router.use('/login', loginController);
 router.use('/dashboard', dashboardController);
 
-
 router.use('/user', userController(db));
+router.use('/student', personalController(db, process.env.STUDENT_ROLE));
+router.use('/teacher', personalController(db, process.env.TEACHER_ROLE));
+
 router.use('/course', courseController(db));
-router.use('/student', studentController(db));
+router.use('/grade', gradeController(db));
+router.use('/subject', subjectController(db));
+
+router.use('/role', roleController(db));
+router.use('/permission', permissionController(db));
+router.use('/periode', periodeController(db));
+
 
 
 
